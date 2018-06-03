@@ -6,10 +6,16 @@
         <label for="title">Smoothie Title:</label>
         <input type="text" name="title" v-model="title"/>
       </div>
+      <div class="field" v-for="(ingredient, i) in ingredients" :key="i">
+        <label for="ingredient">Ingredient:</label>
+        <input type="text" name="ingredient" v-model="ingredients[i]">
+        <i class="material-icons delete" @click="deleteIngredient(ingredient)">delete</i>
+      </div>
       <div class="field add-ingredient">
         <label for="add-ingredient">Add Ingredient</label>
-        <input type="text" name="add-ingredient"/>
+        <input type="text" name="add-ingredient" @keydown.tab.prevent="addIngredient" v-model="another"/>
       </div>
+      <p class="red-text" v-if="feedback">{{ feedback }}</p>
       <div class="field center-align">
         <button class="btn pink">Add Smoothie</button>
       </div>
@@ -18,16 +24,53 @@
 </template>
 
 <script>
+import db from '@/firebase/init'
+import slugify from 'slugify'
+
 export default {
   name: 'AddSmoothie',
   data () {
     return {
-      title: null
+      title: null,
+      another: null,
+      ingredients : [],
+      feedback: null,
+      slug: null
     }
   },
   methods: {
     addSmoothie () {
-      console.log(this.title)
+      if (this.title) {
+        this.feedback = null
+        this.slug = slugify(this.title, { 
+          replacement: '-', 
+          remove: /[$*_+~.()'"!\-:@]/g, 
+          lower: true })
+        db.collection('smoothies')
+        .add({ 
+          title: this.title, 
+          ingredients: this.ingredients, 
+          slug: this.slug})
+        .then(() => {
+          this.$router.push({ name: 'Index' })
+        }).catch(err => {
+          console.log(err)
+        })
+      } else {
+        this.feedback = 'You must enter a smoothie title'
+      }
+    },
+    addIngredient () {
+      if(this.another) {
+        this.ingredients.push(this.another)
+        this.another = null
+        this.feedback = null
+      } else {
+        this.feedback = "You need to enter something"
+      }
+    },
+    deleteIngredient (deleted) {
+      this.ingredients = this.ingredients.filter(ingredient => ingredient !== deleted)
     }
   }
 }
@@ -47,6 +90,16 @@ export default {
 
   .add-smoothie .field {
     margin: 20px auto;
+    position: relative;
+  }
+
+  .add-smoothie .delete {
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    bottom: 16px;
+    color: #aaa;
+    font-size: 1.4em;
   }
 </style>
 
