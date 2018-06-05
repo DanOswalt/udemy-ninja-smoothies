@@ -59,18 +59,6 @@ export default {
       } else {
         this.feedback = 'You must enter a smoothie title'
       }
-    },
-    addIngredient () {
-      if(this.another) {
-        this.ingredients.push(this.another)
-        this.another = null
-        this.feedback = null
-      } else {
-        this.feedback = "You need to enter something"
-      }
-    },
-    deleteIngredient (deleted) {
-      this.ingredients = this.ingredients.filter(ingredient => ingredient !== deleted)
     }
   }
 }

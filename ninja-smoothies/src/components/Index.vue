@@ -14,7 +14,6 @@
         <router-link :to=" { name: 'EditSmoothie', params: { smoothie_slug: smoothie.slug } }">
           <i class="material-icons edit">edit</i>
         </router-link>
-        
       </span>
     </div>
   </div>
@@ -34,12 +33,13 @@ export default {
     deleteSmoothie (id) {
       // delete doc
       db.collection('smoothies').doc(id).delete()
-      .then(() => this.smoothies = this.smoothies.filter(smoothie => smoothie.id != id))
+      .then(() => this.smoothies = this.smoothies.filter(smoothie => smoothie.id !== id))
     }
   },
   created () {
-    // fetch 
-    db.collection('smoothies').get()
+    // fetch
+    db.collection('smoothies')
+    .get()
     .then(snapshot => {
       snapshot.forEach(doc => {
         let smoothie = doc.data()
@@ -48,7 +48,7 @@ export default {
       })
     })
   }
-} 
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
